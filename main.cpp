@@ -163,7 +163,10 @@ void EchoMachine::Overdrive::distortionType(char distoType)
 
 void EchoMachine::distorSignal ()
 {
+    /*
     std::cout << "EchoMachine::distorSignal " << numPlaybackHead << std::endl;  //2) printing out something interesting
+    */
+    std::cout << "\nTHIS \nEchoMachine : numPlaybackHead -> " << this->numPlaybackHead  << "\n" << "and EchoMachine : tapeReadSpeed -> " << this->tapeReadSpeed << std::endl;
 }
 
 void EchoMachine::repeatSoundSource (bool repeatState, float loopStart, float loopEnd, float looplength)
@@ -229,7 +232,11 @@ void SolideStateAmp::signalProcessing(bool processSignal, int sampleStart, int s
 {
    sampleEnd = (processSignal != 1) ? 0 : 1 + sampleStart;
 
+    /*
    std::cout << " \nSolideStateAmp::signalProcessing ampModelingPresets: " << ampModelingPresets << " \nsampleEnd: " << sampleEnd << std::endl;
+   */
+
+   std::cout << "\nTHIS\nSolideStateAmp : numSpeakers -> " << this->numSpeakers  << "\n" << "and SolideStateAmp : speakerSize -> " << this->speakerSize << std::endl;
 }
 
 void SolideStateAmp::imitateTubeAmp(int ampSelectIndex, std::string speakerIr)
@@ -301,6 +308,11 @@ struct PerformanceMeter
     void displayRam (int posX, int posY, float width, float height,bool active);
     void displayDiskRead (int posX, int posY, float width, float height,bool active);
     void isWindowToBig (float myWindowH, float myWindowW);
+    
+    void printThisFm()
+    {
+        std::cout << "\nTHIS\nPerformanceMeter : textSize -> " << this->textSize  << "\n" << "and PerformanceMeter : windowSize -> " << this->windowSize << std::endl;
+    }
     
 };
 
@@ -465,6 +477,7 @@ int main()
     SolideStateAmp solidAmp;
     PerformanceMeter perfoMeter;
 
+    /*
     Prog1 p1;
     Prog2 p2;
 
@@ -484,6 +497,22 @@ int main()
     
     p2.printFunctionA();
     p2.printFunctionB();
+    */
 
-    std::cout << "good to go!" << std::endl;
+    //if you don't have any std::cout statements in main() that access member variables of your U.D.Ts
+    
+    echoMch.distorSignal();
+    solidAmp.signalProcessing(true, 1, 44100);
+    perfoMeter.printThisFm();
+
+    std::cout << "\nEchoMachine : numPlaybackHead = " << echoMch.numPlaybackHead  << "\n" << "and EchoMachine : tapeReadSpeed = " << echoMch.tapeReadSpeed << std::endl;
+
+    std::cout << "\nSolideStateAmp : numSpeakers = " << solidAmp.numSpeakers  << "\n" << "and SolideStateAmp : speakerSize = " << solidAmp.speakerSize << std::endl;
+
+    std::cout << "\nPerformanceMeter : textSize = " << perfoMeter.textSize  << "\n" << "and PerformanceMeter : windowSize = " << perfoMeter.windowSize << std::endl;
+
+
+    
+
+    std::cout << "\ngood to go!" << std::endl;
 }
