@@ -477,7 +477,7 @@ int main()
     SolideStateAmp solidAmp;
     PerformanceMeter perfoMeter;
 
-    /*
+    
     Prog1 p1;
     Prog2 p2;
 
@@ -497,20 +497,18 @@ int main()
     
     p2.printFunctionA();
     p2.printFunctionB();
-    */
+    
 
     //if you don't have any std::cout statements in main() that access member variables of your U.D.Ts
     
-    echoMch.distorSignal();
-    solidAmp.signalProcessing(true, 1, 44100);
-    perfoMeter.printThisFm();
-
     std::cout << "\nEchoMachine : numPlaybackHead = " << echoMch.numPlaybackHead  << "\n" << "and EchoMachine : tapeReadSpeed = " << echoMch.tapeReadSpeed << std::endl;
-
+    echoMch.distorSignal();
+    
     std::cout << "\nSolideStateAmp : numSpeakers = " << solidAmp.numSpeakers  << "\n" << "and SolideStateAmp : speakerSize = " << solidAmp.speakerSize << std::endl;
+    solidAmp.signalProcessing(true, 1, 44100);
 
     std::cout << "\nPerformanceMeter : textSize = " << perfoMeter.textSize  << "\n" << "and PerformanceMeter : windowSize = " << perfoMeter.windowSize << std::endl;
-
+    perfoMeter.printThisFm();
 
     
 
