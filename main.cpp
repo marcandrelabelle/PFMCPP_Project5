@@ -53,6 +53,8 @@ You don't have to do this, you can keep your current object name and just change
  copied UDT 1:
  */
 #include <iostream>
+#include <string>
+#include "LeakedObjectDetector.h"
 
 struct EchoMachine
 {
@@ -87,6 +89,8 @@ struct EchoMachine
         void limitSig (int inputSig, int limiTresh,bool autoMakeUpGain);
         void filterSig (int inputIndex, float q,float freq, char filterType);
         void distortionType (char distoType);
+
+        JUCE_LEAK_DETECTOR(Overdrive)
     };
 
     void distorSignal ();
@@ -96,6 +100,30 @@ struct EchoMachine
     void tapeSpeed (bool playTape, int tapeSpeed);
 
     void echoFunction (int treshold);
+
+    JUCE_LEAK_DETECTOR(EchoMachine)
+};
+
+struct OverdriveWrapper
+{
+    OverdriveWrapper( EchoMachine::Overdrive* ptr ) : pointerToOverdrive( ptr ) {}
+    ~OverdriveWrapper()
+    {
+        delete pointerToOverdrive;
+    }
+    
+    EchoMachine::Overdrive* pointerToOverdrive = nullptr;
+};
+
+struct EchoMachineWrapper
+{
+    EchoMachineWrapper( EchoMachine* ptr ) : pointerToEmachine( ptr ) {}
+    ~EchoMachineWrapper()
+    {
+        delete pointerToEmachine;
+    }
+    
+    EchoMachine* pointerToEmachine = nullptr;
 };
 
 void EchoMachine::Overdrive::limitSig(int inputSig, int limiTresh, bool autoMakeUpGain)
@@ -212,6 +240,19 @@ struct SolideStateAmp
     void imitateTubeAmp (int ampSelectIndex, std::string speakerIr); 
     void amplifieSound (int inputSig, float gain);
     float volumeLevel (float maxVolume);
+
+    JUCE_LEAK_DETECTOR(SolideStateAmp)
+};
+
+struct SolideStateAmpWrapper
+{
+    SolideStateAmpWrapper( SolideStateAmp* ptr ) : pointerToSolideStateAmp( ptr ) {}
+    ~SolideStateAmpWrapper()
+    {
+        delete pointerToSolideStateAmp;
+    }
+    
+    SolideStateAmp* pointerToSolideStateAmp = nullptr;
 };
 
 void SolideStateAmp::signalProcessing(bool processSignal, int sampleStart, int sampleEnd)
@@ -288,6 +329,7 @@ struct PerformanceMeter
         {
             std::cout << "dtor -> PerformanceMeter::DefaultMainWindow" << std::endl;
         }
+    JUCE_LEAK_DETECTOR(DefaultMainWindow)
 };
 
     void displayCpu (int posX, int posY, float width, float height,bool active, double cpuClock);
@@ -299,7 +341,31 @@ struct PerformanceMeter
     {
         std::cout << "\nTHIS\nPerformanceMeter : textSize -> " << this->textSize  << "\n" << "and PerformanceMeter : windowSize -> " << this->windowSize << std::endl;
     }
+
+    JUCE_LEAK_DETECTOR(PerformanceMeter)
     
+};
+
+struct PerformanceMeterWrapper
+{
+    PerformanceMeterWrapper( PerformanceMeter* ptr ) : pointerToPerformanceMeter( ptr ) {}
+    ~PerformanceMeterWrapper()
+    {
+        delete pointerToPerformanceMeter;
+    }
+    
+    PerformanceMeter* pointerToPerformanceMeter = nullptr;
+};
+
+struct DefaultMainWindowWrapper
+{
+    DefaultMainWindowWrapper( PerformanceMeter::DefaultMainWindow* ptr ) : pointerToDefaultMainWindow( ptr ) {}
+    ~DefaultMainWindowWrapper()
+    {
+        delete pointerToDefaultMainWindow;
+    }
+    
+    PerformanceMeter::DefaultMainWindow* pointerToDefaultMainWindow = nullptr;
 };
 
 PerformanceMeter::PerformanceMeter()
@@ -399,6 +465,19 @@ struct Prog1
 
     void printFuntionA();
     void printFuntionB();
+
+    JUCE_LEAK_DETECTOR(Prog1)
+};
+
+struct Prog1Wrapper
+{
+    Prog1Wrapper( Prog1* ptr ) : pointerToProg1( ptr ) {}
+    ~Prog1Wrapper()
+    {
+        delete pointerToProg1;
+    }
+    
+    Prog1* pointerToProg1 = nullptr;
 };
 
 void Prog1::printFuntionA()
@@ -415,7 +494,7 @@ void Prog1::printFuntionB()
  new UDT 5:
  with 2 member functions
  */
- struct Prog2
+struct Prog2
 {
     EchoMachine::Overdrive univox;
     SolideStateAmp bossKatana;
@@ -428,7 +507,20 @@ void Prog1::printFuntionB()
     }
 
     void printFunctionA();
-    void printFunctionB(); 
+    void printFunctionB();
+
+    JUCE_LEAK_DETECTOR(Prog2) 
+};
+
+struct Prog2Wrapper
+{
+    Prog2Wrapper( Prog2* ptr ) : pointerToProg2( ptr ) {}
+    ~Prog2Wrapper()
+    {
+        delete pointerToProg2;
+    }
+    
+    Prog2* pointerToProg2 = nullptr;
 };
 
 void Prog2::printFunctionA()
@@ -459,44 +551,42 @@ void Prog2::printFunctionB()
 //#include <iostream>
 int main()
 {
-    EchoMachine echoMch;
-    SolideStateAmp solidAmp;
-    PerformanceMeter perfoMeter;
+    EchoMachineWrapper echoMch( new EchoMachine() );
+    SolideStateAmpWrapper solidAmp( new SolideStateAmp() );
+    PerformanceMeterWrapper perfoMeter( new PerformanceMeter() );
 
     
-    Prog1 p1;
-    Prog2 p2;
+    Prog1Wrapper p1( new Prog1() );
+    Prog2Wrapper p2( new Prog2() );
 
-    perfoMeter.isWindowToBig(1080, 1920);
-    perfoMeter.isWindowToBig(2160, 3840);
+    perfoMeter.pointerToPerformanceMeter->isWindowToBig(1080, 1920);
+    perfoMeter.pointerToPerformanceMeter->isWindowToBig(2160, 3840);
     
-    echoMch.echoFunction(15);
+    echoMch.pointerToEmachine->echoFunction(15);
     
-    float lvl1 = solidAmp.volumeLevel(15.0f);
-    float lvl2 = solidAmp.volumeLevel(8.5f);
+    float lvl1 = solidAmp.pointerToSolideStateAmp->volumeLevel(15.0f);
+    float lvl2 = solidAmp.pointerToSolideStateAmp->volumeLevel(8.5f);
 
     std::cout << "amp level 1 : " << lvl1 << std::endl;
     std::cout << "amp level 2 : " << lvl2 << std::endl;
     
-    p1.printFuntionA();
-    p1.printFuntionB();
+    p1.pointerToProg1->printFuntionA();
+    p1.pointerToProg1->printFuntionB();
     
-    p2.printFunctionA();
-    p2.printFunctionB();
+    p2.pointerToProg2->printFunctionA();
+    p2.pointerToProg2->printFunctionB();
     
 
     //if you don't have any std::cout statements in main() that access member variables of your U.D.Ts
     
-    std::cout << "\nEchoMachine : numPlaybackHead = " << echoMch.numPlaybackHead  << "\n" << "and EchoMachine : tapeReadSpeed = " << echoMch.tapeReadSpeed << std::endl;
-    echoMch.distorSignal();
+    std::cout << "\nEchoMachine : numPlaybackHead = " << echoMch.pointerToEmachine->numPlaybackHead  << "\n" << "and EchoMachine : tapeReadSpeed = " << echoMch.pointerToEmachine->tapeReadSpeed << std::endl;
+    echoMch.pointerToEmachine->distorSignal();
     
-    std::cout << "\nSolideStateAmp : numSpeakers = " << solidAmp.numSpeakers  << "\n" << "and SolideStateAmp : speakerSize = " << solidAmp.speakerSize << std::endl;
-    solidAmp.signalProcessing(true, 1, 44100);
+    std::cout << "\nSolideStateAmp : numSpeakers = " << solidAmp.pointerToSolideStateAmp->numSpeakers  << "\n" << "and SolideStateAmp : speakerSize = " << solidAmp.pointerToSolideStateAmp->speakerSize << std::endl;
+    solidAmp.pointerToSolideStateAmp->signalProcessing(true, 1, 44100);
 
-    std::cout << "\nPerformanceMeter : textSize = " << perfoMeter.textSize  << "\n" << "and PerformanceMeter : windowSize = " << perfoMeter.windowSize << std::endl;
-    perfoMeter.printThisFm();
-
-    
+    std::cout << "\nPerformanceMeter : textSize = " << perfoMeter.pointerToPerformanceMeter->textSize  << "\n" << "and PerformanceMeter : windowSize = " << perfoMeter.pointerToPerformanceMeter->windowSize << std::endl;
+    perfoMeter.pointerToPerformanceMeter->printThisFm();
 
     std::cout << "\ngood to go!" << std::endl;
 }
